@@ -67,13 +67,14 @@ for row in table.rows[1:]:
     password = 'yourpassword'
 
     while True:
-        name = cell_value
+        #Loại bỏ khoảng trắng thừa tên refset
+        name = cell_value.strip()
         
         # Mã hóa tên hai lần để tạo thành mã hóa kép (Do API yêu cầu mã hoá kép)
         encoded_name = urllib.parse.quote(urllib.parse.quote(name))
 
         # URL cho API, sử dụng f-string để chèn biến `name` vào
-        api_url = f'https://x.x.x.x/api/reference_data/sets/{name}?fields=data(value%2C%20first_seen)'
+        api_url = f'https://x.x.x.x/api/reference_data/sets/{encoded_name}?fields=data(value%2C%20first_seen)'
 
         # Gửi yêu cầu HTTP với xác thực cơ bản và bỏ qua SSL verification
         response = requests.get(api_url, auth=HTTPBasicAuth(username, password), verify=False)

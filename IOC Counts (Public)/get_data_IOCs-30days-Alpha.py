@@ -21,7 +21,7 @@ while True:
     encoded_name = urllib.parse.quote(urllib.parse.quote(name))
 
     # URL cho API, sử dụng f-string để chèn biến `name` vào
-    api_url = f'https://x.x.x.x/api/reference_data/sets/{name}?fields=data(value%2C%20first_seen)'
+    api_url = f'https://x.x.x.x/api/reference_data/sets/{encoded_name}?fields=data(value%2C%20first_seen)'
 
     # Gửi yêu cầu HTTP với xác thực cơ bản và bỏ qua SSL verification
     response = requests.get(api_url, auth=HTTPBasicAuth(username, password), verify=False)
