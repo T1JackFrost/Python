@@ -1,2 +1,2 @@
 # Python
-For SOC contents (Reporting, Tools, ...)
+For SOC contents (Reporting, Tools, Auditing, Enumerating, ...)
