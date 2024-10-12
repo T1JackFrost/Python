@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from datetime import datetime, timedelta
 from docx import Document
+import pandas as pd
 
 input_file_path = r'C:\Users\YourUsername\Downloads\Reference set template.docx'
 
@@ -14,13 +15,16 @@ doc = Document(input_file_path)
 table_index = 0
 table = doc.tables[table_index]
 
-# Duyệt qua từng hàng trong bảng
+username = 'yourusename'
+password = 'yourpassword'
 
+all_data = [] #giữ lại danh sách để không bị ghi đè sau mỗi lần lặp
+output_file_xlxs = fr"C:\Users\YourName\Downloads\IOCs-From-The-Last-30days.xlsx"
+
+# Duyệt qua từng hàng trong bảng
 for row in table.rows[1:]:
     for cell in row.cells:
         cell_value = row.cells[0].text
-    username = 'yourusename'
-    password = 'yourpassword'
 
     while True:
         #Loại bỏ khoảng trắng thừa tên refset
@@ -41,37 +45,39 @@ for row in table.rows[1:]:
 
             # Trích xuất dữ liệu và biến đổi thành danh sách
             result = []
-            for item in json_data["data"]:
-                value = item["value"]
-                timestamp = item["first_seen"] / 1000  # Chuyển miligiây thành giây
-                first_seen_time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-                result.append({"value": value, "first_seen": first_seen_time})
-
+            count = 0
             current_time = datetime.now()
-        # Trích xuất dữ liệu và biến đổi thành danh sách, và lưu vào tệp
-            with open(r'D:\iocs.txt', "w") as file:
-                count = 0
-                for item in json_data["data"]:
+            for item in json_data["data"]:
+                first_seen_time = datetime.fromtimestamp(item["first_seen"] / 1000) # Chuyển miligiây thành giây
+                time_difference = current_time - first_seen_time
+                if time_difference <= timedelta(days=30):
                     value = item["value"]
-                    timestamp = item["first_seen"] / 1000  # Chuyển miligiây thành giây
-                    first_seen_time = datetime.fromtimestamp(timestamp)
+                    result.append(f"Value: {value}, First Seen: {first_seen_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                    count+=1
+                    all_data.append({"Reference Set Name": name, "Value": value, "First Seen": first_seen_time.strftime('%Y-%m-%d %H:%M:%S')})
 
-                    # Tính khoảng thời gian giữa thời điểm hiện tại và first_seen_time
-                    time_difference = current_time - first_seen_time
-                        # So sánh với 30 ngày
-                    if time_difference <= timedelta(days=30):
-                        result = f"Value: {value}, First Seen: {first_seen_time.strftime('%Y-%m-%d %H:%M:%S')}"
-                        file.write(result + "\n")
-                        count += 1
-            print(f"Số kết quả đã được lưu đối với reference set '{name}': {count}") 
+            # Trích xuất dữ liệu và biến đổi thành danh sách, và lưu vào tệp
+            if result:
+                output_file = r'D:\iocs.txt'
+                with open(output_file, "w", encoding = "utf-8") as file:
+                    for line in result:
+                        file.write(line + "\n")
+            print(f"Số kết quả đã được lưu đối với reference set '{name}': {count}")
             row.cells[1].text = str(count) # Gán giá trị của count vào ô thứ hai của hàng hiện tại
             break  # Thoát khỏi vòng lặp khi nhận được phản hồi thành công
         else:
             # In mã lỗi nếu request không thành công và yêu cầu nhập lại
             print(f"Lỗi {response.status_code}: Không tìm thấy reference set '{name}'. Vui lòng thử lại.")
-            break
-        
-              
+            break   
+
+#Ghi data vào file xlsx
+if all_data:
+    combined_df = pd.DataFrame(all_data)
+    combined_df.to_excel(output_file_xlxs, index=False, engine = "openpyxl")
+   
 # Lưu tài liệu sau khi thực hiện các thao tác
-output_file_path = r'C:\Users\YourUsername\Downloads\Refset Count.docx'  # Thay đổi đường dẫn ở đây
+output_file_path = r'C:\Users\YourName\Downloads\Refset Count From The Last 30days.docx' #Thay đổi đường dẫn ở đây
 doc.save(output_file_path)
+
+print(f"Tài liệu đã được lưu tại: {output_file_path}")
+print(f"Tất cả dữ liệu đã được lưu vào file: {output_file_xlxs}")
