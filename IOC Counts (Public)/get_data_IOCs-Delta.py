@@ -66,7 +66,7 @@ time_from_formatted = time_from.replace(" ", "_").replace(":", "-")
 time_to_formatted = time_to.replace(" ", "_").replace(":", "-")
 
 all_data = [] #giữ lại danh sách để không bị ghi đè sau mỗi lần lặp
-output_file_xlxs = fr"C:\Users\HP\Downloads\IOCs-From{time_from_formatted}-To-{time_to_formatted}.xlsx"
+output_file_xlxs = fr"C:\Users\YourUsername\Downloads\IOCs-From{time_from_formatted}-To-{time_to_formatted}.xlsx"
 
 # Duyệt qua từng hàng trong bảng
 for row in table.rows[1:]:
