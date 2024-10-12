@@ -1,7 +1,7 @@
 # IOC Counts
 ## Purposes:
 Counting new IOC numbers add for a specific period of time.  
-Enumerating is still under development. (Completed)
+Enumeration is still under development. (Completed)
 ## Requirements:
 Deployed Console IP address.  
 Your credentials for authentication.  
